@@ -8,6 +8,7 @@ import AddEntryForm from './components/AddEntryForm';
 import EntryList from './components/EntryList';
 import ChartSummary from './components/ChartSummary';
 import CatMascot from './components/CatMascot';
+import InstallBanner from './components/InstallBanner';
 
 function currentMonthKey() {
   const d = new Date();
@@ -55,6 +56,8 @@ export default function App() {
           </button>
         )}
       </header>
+
+      <InstallBanner />
 
       <main className="app-main">
         <SummaryHero income={income} expense={expense} />
