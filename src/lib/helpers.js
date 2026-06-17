@@ -66,6 +66,22 @@ export function uid() {
   return `${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
 }
 
+export function formatGoldWeight(n) {
+  const num = Number(n) || 0;
+  return num.toLocaleString('th-TH', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+}
+
+// Returns 'overdue' | 'soon' | null based on a loan's due date relative to today.
+// 'soon' covers the next 3 days so the reminder has some lead time, not just same-day.
+export function loanDueStatus(dueDate) {
+  if (!dueDate) return null;
+  const today = todayISO();
+  if (dueDate < today) return 'overdue';
+  const diffDays = (new Date(dueDate) - new Date(today)) / (1000 * 60 * 60 * 24);
+  if (diffDays <= 3) return 'soon';
+  return null;
+}
+
 export const CAT_QUOTES_HAPPY = [
   'เงินเหลือ เปาเบียร์ยิ้มแก้มปริ!',
   'เก่งมาก! พุงเปาเบียร์อิ่มเอม',

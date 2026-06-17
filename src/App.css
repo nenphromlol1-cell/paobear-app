@@ -694,8 +694,192 @@
   display: inline-block;
 }
 
+/* ---------- Loans & gold sub-tabs ---------- */
+.subtab-row {
+  display: flex;
+  background: var(--cream-deep);
+  border-radius: var(--radius-pill);
+  padding: 4px;
+  margin-bottom: 16px;
+}
+
+.subtab-btn {
+  flex: 1;
+  border: none;
+  background: none;
+  padding: 10px 0;
+  border-radius: var(--radius-pill);
+  font-weight: 700;
+  font-size: 13.5px;
+  color: var(--ink-soft);
+  transition: background 0.18s ease, color 0.18s ease;
+}
+
+.subtab-btn.is-active {
+  background: var(--grape);
+  color: var(--white);
+}
+
+.reminder-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--coral-pale);
+  border: 2px solid var(--coral);
+  color: var(--coral-deep);
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  margin-bottom: 14px;
+}
+
+.loan-summary-card {
+  background: var(--white);
+  border: 2px solid var(--cream-deep);
+  border-radius: var(--radius-lg);
+  padding: 14px 16px;
+  margin-bottom: 14px;
+}
+
+.loan-summary-card__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13.5px;
+  color: var(--ink-soft);
+  padding: 6px 0;
+}
+
+.loan-summary-card__row strong {
+  font-family: var(--font-display);
+  font-size: 15px;
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.loan-summary-card__row--total {
+  border-top: 2px solid var(--cream-deep);
+  margin-top: 4px;
+  padding-top: 10px;
+}
+.loan-summary-card__row--total strong {
+  font-size: 18px;
+  color: var(--grape-deep);
+}
+
+.add-toggle-btn {
+  width: 100%;
+  background: var(--grape-pale);
+  color: var(--grape-deep);
+  border: 2px solid var(--grape);
+  font-weight: 700;
+  font-size: 14px;
+  padding: 12px;
+  border-radius: var(--radius-pill);
+  margin-bottom: 16px;
+}
+.add-toggle-btn:active {
+  transform: scale(0.98);
+}
+
+.loan-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.loan-row {
+  background: var(--white);
+  border: 2px solid var(--cream-deep);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+}
+
+.loan-row--repaid {
+  opacity: 0.6;
+}
+
+.loan-row__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.loan-row__who {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.loan-row__name {
+  font-weight: 700;
+  font-size: 14.5px;
+}
+
+.loan-row__badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+}
+.loan-row__badge--repaid { background: var(--mint-pale); color: var(--mint-deep); }
+.loan-row__badge--overdue { background: var(--coral); color: var(--white); }
+.loan-row__badge--soon { background: var(--mango-pale); color: var(--mango-deep); }
+
+.loan-row__amounts {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.loan-row__label {
+  font-size: 11px;
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+
+.loan-row__value {
+  font-size: 14px;
+  font-weight: 700;
+  font-family: var(--font-display);
+  margin-top: 1px;
+}
+
+.loan-row__value--total {
+  color: var(--grape-deep);
+}
+
+.loan-row__meta {
+  font-size: 12px;
+  color: var(--ink-soft);
+  margin-bottom: 10px;
+}
+
+.loan-row__toggle {
+  width: 100%;
+  background: var(--cream-deep);
+  border: none;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink);
+  padding: 9px;
+  border-radius: var(--radius-md);
+}
+.loan-row__toggle:active {
+  transform: scale(0.98);
+}
+
 /* ---------- Responsive ---------- */
 @media (max-width: 380px) {
   .hero-card__amount { font-size: 28px; }
   .category-grid { grid-template-columns: 1fr 1fr; }
+  .loan-row__amounts { grid-template-columns: 1fr 1fr; }
+  .loan-row__amounts > div:last-child { grid-column: 1 / -1; }
 }

@@ -1,6 +1,7 @@
 const TABS = [
-  { key: 'add', label: 'เพิ่มรายการ', icon: '➕' },
+  { key: 'add', label: 'เพิ่ม', icon: '➕' },
   { key: 'list', label: 'รายการ', icon: '📋' },
+  { key: 'loans', label: 'กู้/ทอง', icon: '🤝' },
   { key: 'chart', label: 'สรุป', icon: '📊' },
 ];
 

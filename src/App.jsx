@@ -1,12 +1,14 @@
 import { useMemo, useState } from 'react';
 import './App.css';
 import { useEntries } from './hooks/useEntries';
+import { useLoansAndGold } from './hooks/useLoansAndGold';
 import { monthKey } from './lib/helpers';
 import SummaryHero from './components/SummaryHero';
 import TabBar from './components/TabBar';
 import AddEntryForm from './components/AddEntryForm';
 import EntryList from './components/EntryList';
 import ChartSummary from './components/ChartSummary';
+import LoansAndGoldTab from './components/LoansAndGoldTab';
 import CatMascot from './components/CatMascot';
 import InstallBanner from './components/InstallBanner';
 
@@ -18,6 +20,10 @@ function currentMonthKey() {
 
 export default function App() {
   const { entries, addEntry, deleteEntry, clearAll } = useEntries();
+  const {
+    loans, addLoan, updateLoan, deleteLoan,
+    goldEntries, addGoldEntry, deleteGoldEntry, clearLoansAndGold,
+  } = useLoansAndGold();
   const [tab, setTab] = useState('add');
   const [confirmingReset, setConfirmingReset] = useState(false);
 
@@ -41,11 +47,16 @@ export default function App() {
   function handleReset() {
     if (confirmingReset) {
       clearAll();
+      clearLoansAndGold();
       setConfirmingReset(false);
     } else {
       setConfirmingReset(true);
       setTimeout(() => setConfirmingReset(false), 4000);
     }
+  }
+
+  function handleToggleRepaid(id, repaid) {
+    updateLoan(id, { repaid });
   }
 
   return (
@@ -58,7 +69,7 @@ export default function App() {
             <p className="app-header__subtitle">รายรับ-รายจ่ายของเรา</p>
           </div>
         </div>
-        {entries.length > 0 && (
+        {(entries.length > 0 || loans.length > 0 || goldEntries.length > 0) && (
           <button className="app-header__reset" onClick={handleReset}>
             {confirmingReset ? 'แน่ใจนะ? กดอีกครั้ง' : 'ล้างข้อมูล'}
           </button>
@@ -73,6 +84,17 @@ export default function App() {
         <div className="tab-panel">
           {tab === 'add' && <AddEntryForm onAdd={addEntry} />}
           {tab === 'list' && <EntryList entries={entries} onDelete={deleteEntry} />}
+          {tab === 'loans' && (
+            <LoansAndGoldTab
+              loans={loans}
+              onAddLoan={addLoan}
+              onToggleRepaid={handleToggleRepaid}
+              onDeleteLoan={deleteLoan}
+              goldEntries={goldEntries}
+              onAddGold={addGoldEntry}
+              onDeleteGold={deleteGoldEntry}
+            />
+          )}
           {tab === 'chart' && <ChartSummary entries={entries} />}
         </div>
       </main>
