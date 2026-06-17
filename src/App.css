@@ -325,6 +325,13 @@
   margin: -6px 0 14px;
 }
 
+.field__hint {
+  color: var(--ink-soft);
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 8px;
+}
+
 /* ---------- Category chips ---------- */
 .category-grid {
   display: grid;
@@ -527,6 +534,16 @@
   color: var(--ink-soft);
   text-align: center;
   padding: 24px 0;
+}
+
+.chart-block__meta {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--grape-deep);
+  text-align: right;
+  margin-top: 10px;
+  border-top: 2px solid var(--cream-deep);
+  padding-top: 10px;
 }
 
 .chart-tooltip {

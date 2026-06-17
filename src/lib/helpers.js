@@ -82,6 +82,33 @@ export function loanDueStatus(dueDate) {
   return null;
 }
 
+// How much cash/bank money is currently "tied up" in active loans and gold,
+// plus how much has come back in via repayments. Used to adjust the
+// spendable cash/bank balances (money out when lent/bought, money back in when repaid).
+export function computeWalletAdjustments(loans, goldEntries) {
+  let cashDelta = 0;
+  let bankDelta = 0;
+
+  loans.forEach((loan) => {
+    const method = loan.paymentMethod || 'bank';
+    // Money left the wallet when the loan was given out.
+    const out = loan.principal;
+    // Money returns to the wallet (principal + interest) once marked repaid.
+    const back = loan.repaid ? loan.principal + (loan.interest || 0) : 0;
+    const net = back - out;
+    if (method === 'cash') cashDelta += net;
+    else bankDelta += net;
+  });
+
+  goldEntries.forEach((g) => {
+    const method = g.paymentMethod || 'bank';
+    if (method === 'cash') cashDelta -= g.price;
+    else bankDelta -= g.price;
+  });
+
+  return { cashDelta, bankDelta };
+}
+
 export const CAT_QUOTES_HAPPY = [
   'เงินเหลือ เปาเบียร์ยิ้มแก้มปริ!',
   'เก่งมาก! พุงเปาเบียร์อิ่มเอม',

@@ -1,15 +1,19 @@
 import { useState } from 'react';
-import { todayISO, uid } from '../lib/helpers';
+import { todayISO, uid, formatTHB, PAYMENT_METHODS } from '../lib/helpers';
+import Baht from './Baht';
 
-export default function LoanForm({ onAdd }) {
+export default function LoanForm({ onAdd, cashBalance, bankBalance }) {
   const [borrower, setBorrower] = useState('');
   const [principal, setPrincipal] = useState('');
   const [interest, setInterest] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState(PAYMENT_METHODS[0].key);
   const [lendDate, setLendDate] = useState(todayISO());
   const [dueDate, setDueDate] = useState('');
   const [note, setNote] = useState('');
   const [error, setError] = useState('');
   const [successPulse, setSuccessPulse] = useState(false);
+
+  const availableBalance = paymentMethod === 'cash' ? cashBalance : bankBalance;
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -22,12 +26,18 @@ export default function LoanForm({ onAdd }) {
       setError('กรอกจำนวนเงินต้นที่มากกว่า 0');
       return;
     }
+    if (principalNum > availableBalance) {
+      const methodLabel = PAYMENT_METHODS.find((p) => p.key === paymentMethod).label;
+      setError(`${methodLabel}เหลือไม่พอ (เหลือ ฿${formatTHB(availableBalance)}) ลองเลือกกระเป๋าอื่นดูนะ`);
+      return;
+    }
     setError('');
     onAdd({
       id: uid(),
       borrower: borrower.trim(),
       principal: principalNum,
       interest: parseFloat(interest) || 0,
+      paymentMethod,
       lendDate,
       dueDate: dueDate || null,
       note: note.trim(),
@@ -69,6 +79,26 @@ export default function LoanForm({ onAdd }) {
           className="field__input field__input--amount"
         />
       </label>
+
+      <fieldset className="field" style={{ border: 'none', padding: 0 }}>
+        <legend className="field__label">หักออกจาก</legend>
+        <div className="payment-row" role="radiogroup" aria-label="ช่องทางการเงิน">
+          {PAYMENT_METHODS.map((pm) => (
+            <button
+              type="button"
+              key={pm.key}
+              role="radio"
+              aria-checked={paymentMethod === pm.key}
+              className={`payment-chip ${paymentMethod === pm.key ? 'is-active' : ''}`}
+              onClick={() => { setPaymentMethod(pm.key); setError(''); }}
+            >
+              <span aria-hidden="true">{pm.icon}</span>
+              <span>{pm.label}</span>
+            </button>
+          ))}
+        </div>
+        <p className="field__hint">เหลือ <Baht />{formatTHB(availableBalance)}</p>
+      </fieldset>
 
       <label className="field">
         <span className="field__label">ดอกเบี้ย (บาท ไม่บังคับ)</span>

@@ -24,7 +24,22 @@ function CustomTooltip({ active, payload }) {
   );
 }
 
-export default function ChartSummary({ entries }) {
+export default function ChartSummary({ entries, cashBalance, bankBalance, loans, goldEntries }) {
+  const assetData = useMemo(() => {
+    const outstandingLoans = loans
+      .filter((l) => !l.repaid)
+      .reduce((s, l) => s + l.principal + (l.interest || 0), 0);
+    const goldValue = goldEntries.reduce((s, g) => s + g.price, 0);
+    return [
+      { key: 'cash', name: 'เงินสด', value: Math.max(cashBalance, 0), color: '#2EC4B6' },
+      { key: 'bank', name: 'เงินในบัญชี', value: Math.max(bankBalance, 0), color: '#8E6FE5' },
+      { key: 'loans', name: 'เงินกู้ที่ปล่อยอยู่', value: outstandingLoans, color: '#FF6F59' },
+      { key: 'gold', name: 'ทอง (ต้นทุน)', value: goldValue, color: '#FFB627' },
+    ];
+  }, [cashBalance, bankBalance, loans, goldEntries]);
+
+  const totalAssets = assetData.reduce((s, a) => s + a.value, 0);
+
   const months = useMemo(() => {
     const set = new Set(entries.map((e) => monthKey(e.date)));
     const now = new Date();
@@ -71,6 +86,34 @@ export default function ChartSummary({ entries }) {
 
   return (
     <section>
+      <div className="chart-block">
+        <h3 className="chart-block__title">สินทรัพย์ทั้งหมดแยกประเภท</h3>
+        <ul className="legend-list">
+          {assetData.map((a) => (
+            <li key={a.key} className="legend-list__item">
+              <span className="legend-list__dot" style={{ background: a.color }} />
+              <span className="legend-list__name">{a.name}</span>
+              <span className="legend-list__pct"><Baht />{formatTHB(a.value)}</span>
+            </li>
+          ))}
+        </ul>
+        <div style={{ width: '100%', height: 200 }}>
+          <ResponsiveContainer>
+            <BarChart data={assetData} layout="vertical" margin={{ left: 8, right: 16 }}>
+              <XAxis type="number" hide />
+              <YAxis type="category" dataKey="name" tick={{ fill: 'var(--ink-soft)', fontSize: 11, fontFamily: 'Noto Sans Thai' }} axisLine={false} tickLine={false} width={108} />
+              <Tooltip content={<CustomTooltip />} />
+              <Bar dataKey="value" radius={[0, 8, 8, 0]} maxBarSize={26}>
+                {assetData.map((a, i) => (
+                  <Cell key={i} fill={a.color} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+        <p className="chart-block__meta">รวมสินทรัพย์ทั้งหมด <Baht />{formatTHB(totalAssets)}</p>
+      </div>
+
       <select
         className="month-select"
         value={activeMonth}

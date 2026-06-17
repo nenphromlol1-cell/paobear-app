@@ -2,11 +2,12 @@ import { useMemo, useState } from 'react';
 import LoanForm from './LoanForm';
 import GoldForm from './GoldForm';
 import Baht from './Baht';
-import { formatTHB, formatGoldWeight, formatDateThai, loanDueStatus } from '../lib/helpers';
+import { formatTHB, formatGoldWeight, formatDateThai, loanDueStatus, PAYMENT_METHODS } from '../lib/helpers';
 
 function LoanRow({ loan, onToggleRepaid, onDelete }) {
   const status = loan.repaid ? null : loanDueStatus(loan.dueDate);
   const totalOwed = loan.principal + (loan.interest || 0);
+  const method = PAYMENT_METHODS.find((p) => p.key === (loan.paymentMethod || 'bank'));
 
   return (
     <li className={`loan-row ${loan.repaid ? 'loan-row--repaid' : ''}`}>
@@ -38,12 +39,13 @@ function LoanRow({ loan, onToggleRepaid, onDelete }) {
 
       <p className="loan-row__meta">
         ให้กู้ {formatDateThai(loan.lendDate)}
+        {' · '}<span aria-hidden="true">{method.icon}</span> {method.label}
         {loan.dueDate && ` · ครบกำหนด ${formatDateThai(loan.dueDate)}`}
         {loan.note && ` · ${loan.note}`}
       </p>
 
       <button className="loan-row__toggle" onClick={() => onToggleRepaid(loan.id, !loan.repaid)}>
-        {loan.repaid ? 'ทำเครื่องหมายว่ายังไม่คืน' : 'ทำเครื่องหมายว่าคืนแล้ว'}
+        {loan.repaid ? 'ทำเครื่องหมายว่ายังไม่คืน' : `ทำเครื่องหมายว่าคืนแล้ว (เงินเข้า${method.label})`}
       </button>
     </li>
   );
@@ -52,6 +54,7 @@ function LoanRow({ loan, onToggleRepaid, onDelete }) {
 export default function LoansAndGoldTab({
   loans, onAddLoan, onToggleRepaid, onDeleteLoan,
   goldEntries, onAddGold, onDeleteGold,
+  cashBalance, bankBalance,
 }) {
   const [section, setSection] = useState('loans');
   const [formOpen, setFormOpen] = useState(false);
@@ -128,7 +131,13 @@ export default function LoansAndGoldTab({
             {formOpen ? 'ปิดฟอร์ม' : '+ เพิ่มรายการปล่อยกู้'}
           </button>
 
-          {formOpen && <LoanForm onAdd={(loan) => { onAddLoan(loan); setFormOpen(false); }} />}
+          {formOpen && (
+            <LoanForm
+              onAdd={(loan) => { onAddLoan(loan); setFormOpen(false); }}
+              cashBalance={cashBalance}
+              bankBalance={bankBalance}
+            />
+          )}
 
           {sortedLoans.length === 0 ? (
             <p className="chart-block__empty">ยังไม่มีรายการปล่อยกู้</p>
@@ -159,27 +168,41 @@ export default function LoansAndGoldTab({
             {formOpen ? 'ปิดฟอร์ม' : '+ เพิ่มรายการออมทอง'}
           </button>
 
-          {formOpen && <GoldForm onAdd={(entry) => { onAddGold(entry); setFormOpen(false); }} />}
+          {formOpen && (
+            <GoldForm
+              onAdd={(entry) => { onAddGold(entry); setFormOpen(false); }}
+              cashBalance={cashBalance}
+              bankBalance={bankBalance}
+            />
+          )}
 
           {goldEntries.length === 0 ? (
             <p className="chart-block__empty">ยังไม่มีรายการออมทอง</p>
           ) : (
             <ul className="entry-list">
-              {goldEntries.map((g) => (
-                <li key={g.id} className="entry-row">
-                  <span className="entry-row__icon entry-row__icon--mango" aria-hidden="true">🪙</span>
-                  <div className="entry-row__info">
-                    <p className="entry-row__title">
-                      {formatGoldWeight(g.weight)} บาททอง{g.note ? ` · ${g.note}` : ''}
-                    </p>
-                    <p className="entry-row__date">{formatDateThai(g.date)}</p>
-                  </div>
-                  <span className="entry-row__amount entry-row__amount--expense">
-                    <Baht />{formatTHB(g.price)}
-                  </span>
-                  <button className="entry-row__delete" aria-label="ลบรายการทอง" onClick={() => onDeleteGold(g.id)}>✕</button>
-                </li>
-              ))}
+              {goldEntries.map((g) => {
+                const method = PAYMENT_METHODS.find((p) => p.key === (g.paymentMethod || 'bank'));
+                return (
+                  <li key={g.id} className="entry-row">
+                    <span className="entry-row__icon entry-row__icon--mango" aria-hidden="true">🪙</span>
+                    <div className="entry-row__info">
+                      <p className="entry-row__title">
+                        {formatGoldWeight(g.weight)} บาททอง{g.note ? ` · ${g.note}` : ''}
+                      </p>
+                      <p className="entry-row__date">
+                        {formatDateThai(g.date)}
+                        <span className="entry-row__method" aria-label={method.label}>
+                          <span aria-hidden="true">{method.icon}</span>
+                        </span>
+                      </p>
+                    </div>
+                    <span className="entry-row__amount entry-row__amount--expense">
+                      <Baht />{formatTHB(g.price)}
+                    </span>
+                    <button className="entry-row__delete" aria-label="ลบรายการทอง" onClick={() => onDeleteGold(g.id)}>✕</button>
+                  </li>
+                );
+              })}
             </ul>
           )}
         </>

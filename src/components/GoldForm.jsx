@@ -1,13 +1,17 @@
 import { useState } from 'react';
-import { todayISO, uid } from '../lib/helpers';
+import { todayISO, uid, formatTHB, PAYMENT_METHODS } from '../lib/helpers';
+import Baht from './Baht';
 
-export default function GoldForm({ onAdd }) {
+export default function GoldForm({ onAdd, cashBalance, bankBalance }) {
   const [weight, setWeight] = useState('');
   const [price, setPrice] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState(PAYMENT_METHODS[0].key);
   const [date, setDate] = useState(todayISO());
   const [note, setNote] = useState('');
   const [error, setError] = useState('');
   const [successPulse, setSuccessPulse] = useState(false);
+
+  const availableBalance = paymentMethod === 'cash' ? cashBalance : bankBalance;
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -21,11 +25,17 @@ export default function GoldForm({ onAdd }) {
       setError('กรอกราคาที่ซื้อให้ถูกต้องด้วย');
       return;
     }
+    if (priceNum > availableBalance) {
+      const methodLabel = PAYMENT_METHODS.find((p) => p.key === paymentMethod).label;
+      setError(`${methodLabel}เหลือไม่พอ (เหลือ ฿${formatTHB(availableBalance)}) ลองเลือกกระเป๋าอื่นดูนะ`);
+      return;
+    }
     setError('');
     onAdd({
       id: uid(),
       weight: weightNum,
       price: priceNum,
+      paymentMethod,
       date,
       note: note.trim(),
     });
@@ -65,6 +75,26 @@ export default function GoldForm({ onAdd }) {
           className="field__input"
         />
       </label>
+
+      <fieldset className="field" style={{ border: 'none', padding: 0 }}>
+        <legend className="field__label">หักออกจาก</legend>
+        <div className="payment-row" role="radiogroup" aria-label="ช่องทางการเงิน">
+          {PAYMENT_METHODS.map((pm) => (
+            <button
+              type="button"
+              key={pm.key}
+              role="radio"
+              aria-checked={paymentMethod === pm.key}
+              className={`payment-chip ${paymentMethod === pm.key ? 'is-active' : ''}`}
+              onClick={() => { setPaymentMethod(pm.key); setError(''); }}
+            >
+              <span aria-hidden="true">{pm.icon}</span>
+              <span>{pm.label}</span>
+            </button>
+          ))}
+        </div>
+        <p className="field__hint">เหลือ <Baht />{formatTHB(availableBalance)}</p>
+      </fieldset>
 
       <label className="field">
         <span className="field__label">วันที่ซื้อ</span>

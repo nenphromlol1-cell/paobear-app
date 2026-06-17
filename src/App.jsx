@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import './App.css';
 import { useEntries } from './hooks/useEntries';
 import { useLoansAndGold } from './hooks/useLoansAndGold';
-import { monthKey } from './lib/helpers';
+import { monthKey, computeWalletAdjustments } from './lib/helpers';
 import SummaryHero from './components/SummaryHero';
 import TabBar from './components/TabBar';
 import AddEntryForm from './components/AddEntryForm';
@@ -36,13 +36,17 @@ export default function App() {
     // so existing data keeps showing up rather than vanishing from both totals.
     const methodOf = (e) => e.paymentMethod || 'bank';
 
+    const rawCash = entries.filter((e) => methodOf(e) === 'cash').reduce((s, e) => s + signedAmount(e), 0);
+    const rawBank = entries.filter((e) => methodOf(e) === 'bank').reduce((s, e) => s + signedAmount(e), 0);
+    const { cashDelta, bankDelta } = computeWalletAdjustments(loans, goldEntries);
+
     return {
       income: monthEntries.filter((e) => e.type === 'income').reduce((s, e) => s + e.amount, 0),
       expense: monthEntries.filter((e) => e.type === 'expense').reduce((s, e) => s + e.amount, 0),
-      cashBalance: entries.filter((e) => methodOf(e) === 'cash').reduce((s, e) => s + signedAmount(e), 0),
-      bankBalance: entries.filter((e) => methodOf(e) === 'bank').reduce((s, e) => s + signedAmount(e), 0),
+      cashBalance: rawCash + cashDelta,
+      bankBalance: rawBank + bankDelta,
     };
-  }, [entries]);
+  }, [entries, loans, goldEntries]);
 
   function handleReset() {
     if (confirmingReset) {
@@ -93,9 +97,19 @@ export default function App() {
               goldEntries={goldEntries}
               onAddGold={addGoldEntry}
               onDeleteGold={deleteGoldEntry}
+              cashBalance={cashBalance}
+              bankBalance={bankBalance}
             />
           )}
-          {tab === 'chart' && <ChartSummary entries={entries} />}
+          {tab === 'chart' && (
+            <ChartSummary
+              entries={entries}
+              cashBalance={cashBalance}
+              bankBalance={bankBalance}
+              loans={loans}
+              goldEntries={goldEntries}
+            />
+          )}
         </div>
       </main>
 
