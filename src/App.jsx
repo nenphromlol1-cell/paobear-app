@@ -21,12 +21,20 @@ export default function App() {
   const [tab, setTab] = useState('add');
   const [confirmingReset, setConfirmingReset] = useState(false);
 
-  const { income, expense } = useMemo(() => {
+  const { income, expense, cashBalance, bankBalance } = useMemo(() => {
     const thisMonth = currentMonthKey();
     const monthEntries = entries.filter((e) => monthKey(e.date) === thisMonth);
+    const signedAmount = (e) => (e.type === 'income' ? e.amount : -e.amount);
+
+    // Entries saved before the payment-method field existed default to "bank"
+    // so existing data keeps showing up rather than vanishing from both totals.
+    const methodOf = (e) => e.paymentMethod || 'bank';
+
     return {
       income: monthEntries.filter((e) => e.type === 'income').reduce((s, e) => s + e.amount, 0),
       expense: monthEntries.filter((e) => e.type === 'expense').reduce((s, e) => s + e.amount, 0),
+      cashBalance: entries.filter((e) => methodOf(e) === 'cash').reduce((s, e) => s + signedAmount(e), 0),
+      bankBalance: entries.filter((e) => methodOf(e) === 'bank').reduce((s, e) => s + signedAmount(e), 0),
     };
   }, [entries]);
 
@@ -60,7 +68,7 @@ export default function App() {
       <InstallBanner />
 
       <main className="app-main">
-        <SummaryHero income={income} expense={expense} />
+        <SummaryHero income={income} expense={expense} cashBalance={cashBalance} bankBalance={bankBalance} />
 
         <div className="tab-panel">
           {tab === 'add' && <AddEntryForm onAdd={addEntry} />}

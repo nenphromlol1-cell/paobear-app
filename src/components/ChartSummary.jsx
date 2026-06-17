@@ -4,6 +4,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
 } from 'recharts';
 import { findCategory, formatTHB, monthKey, monthLabel } from '../lib/helpers';
+import Baht from './Baht';
 
 const RAMP = {
   coral: '#FF6F59',
@@ -18,7 +19,7 @@ function CustomTooltip({ active, payload }) {
   return (
     <div className="chart-tooltip">
       <strong>{item.name}</strong>
-      <span>฿{formatTHB(item.value)}</span>
+      <span><Baht />{formatTHB(item.value)}</span>
     </div>
   );
 }

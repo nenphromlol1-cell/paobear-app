@@ -150,6 +150,49 @@
   z-index: 1;
 }
 
+/* ---------- Wallet split (cash / bank) ---------- */
+.wallet-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.wallet-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--white);
+  border: 2px solid var(--cream-deep);
+  border-radius: var(--radius-md);
+  padding: 12px;
+}
+
+.wallet-card__icon {
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.wallet-card__info {
+  min-width: 0;
+}
+
+.wallet-card__label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+.wallet-card__amount {
+  font-size: 16px;
+  font-weight: 700;
+  font-family: var(--font-display);
+  margin-top: 1px;
+}
+
+.wallet-card--cash { border-color: var(--mint-pale); }
+.wallet-card--bank { border-color: var(--grape-pale); }
+
 /* ---------- Tab bar ---------- */
 .tabbar {
   display: flex;
@@ -413,6 +456,11 @@
   margin-top: 1px;
 }
 
+.entry-row__method {
+  margin-left: 6px;
+  font-size: 11px;
+}
+
 .entry-row__amount {
   font-size: 14px;
   font-weight: 700;
@@ -600,6 +648,50 @@
   padding: 6px;
   border-radius: 50%;
   flex-shrink: 0;
+}
+
+/* ---------- Payment method chips ---------- */
+.payment-row {
+  display: flex;
+  gap: 8px;
+}
+
+.payment-chip {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 12px;
+  border-radius: var(--radius-md);
+  border: 2px solid var(--cream-deep);
+  background: var(--white);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  transition: transform 0.12s ease, border-color 0.15s ease, background 0.15s ease;
+}
+
+.payment-chip span:first-child {
+  font-size: 16px;
+}
+
+.payment-chip:active {
+  transform: scale(0.97);
+}
+
+.payment-chip.is-active {
+  border-color: var(--mango);
+  background: var(--mango-pale);
+}
+
+/* ---------- Baht symbol ---------- */
+.baht-symbol {
+  font-size: 0.62em;
+  font-weight: 800;
+  margin-right: 0.12em;
+  vertical-align: 0.06em;
+  display: inline-block;
 }
 
 /* ---------- Responsive ---------- */

@@ -20,6 +20,11 @@ export const INCOME_CATEGORIES = [
   { key: 'other_income', label: 'อื่นๆ', icon: '✨', color: 'mango' },
 ];
 
+export const PAYMENT_METHODS = [
+  { key: 'cash', label: 'เงินสด', icon: '💵' },
+  { key: 'bank', label: 'เงินในบัญชี', icon: '💳' },
+];
+
 export function findCategory(type, key) {
   const list = type === 'income' ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
   return list.find((c) => c.key === key) || list[list.length - 1];

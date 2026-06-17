@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { EXPENSE_CATEGORIES, INCOME_CATEGORIES, todayISO, uid } from '../lib/helpers';
+import { EXPENSE_CATEGORIES, INCOME_CATEGORIES, PAYMENT_METHODS, todayISO, uid } from '../lib/helpers';
 
 export default function AddEntryForm({ onAdd }) {
   const [type, setType] = useState('expense');
   const [amount, setAmount] = useState('');
   const [categoryKey, setCategoryKey] = useState(EXPENSE_CATEGORIES[0].key);
+  const [paymentMethod, setPaymentMethod] = useState(PAYMENT_METHODS[0].key);
   const [note, setNote] = useState('');
   const [date, setDate] = useState(todayISO());
   const [error, setError] = useState('');
@@ -32,6 +33,7 @@ export default function AddEntryForm({ onAdd }) {
       type,
       amount: num,
       categoryKey,
+      paymentMethod,
       note: note.trim(),
       date,
     });
@@ -91,6 +93,25 @@ export default function AddEntryForm({ onAdd }) {
             >
               <span aria-hidden="true">{cat.icon}</span>
               <span>{cat.label}</span>
+            </button>
+          ))}
+        </div>
+      </fieldset>
+
+      <fieldset className="field" style={{ border: 'none', padding: 0 }}>
+        <legend className="field__label">จ่ายด้วย</legend>
+        <div className="payment-row" role="radiogroup" aria-label="ช่องทางการเงิน">
+          {PAYMENT_METHODS.map((pm) => (
+            <button
+              type="button"
+              key={pm.key}
+              role="radio"
+              aria-checked={paymentMethod === pm.key}
+              className={`payment-chip ${paymentMethod === pm.key ? 'is-active' : ''}`}
+              onClick={() => setPaymentMethod(pm.key)}
+            >
+              <span aria-hidden="true">{pm.icon}</span>
+              <span>{pm.label}</span>
             </button>
           ))}
         </div>

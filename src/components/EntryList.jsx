@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
-import { findCategory, formatTHB, formatDateThai, monthKey, monthLabel } from '../lib/helpers';
+import { findCategory, formatTHB, formatDateThai, monthKey, monthLabel, PAYMENT_METHODS } from '../lib/helpers';
 import CatMascot from './CatMascot';
+import Baht from './Baht';
 
 export default function EntryList({ entries, onDelete }) {
   const months = useMemo(() => {
@@ -41,6 +42,7 @@ export default function EntryList({ entries, onDelete }) {
         <ul className="entry-list">
           {filtered.map((entry) => {
             const cat = findCategory(entry.type, entry.categoryKey);
+            const paymentMethod = PAYMENT_METHODS.find((p) => p.key === (entry.paymentMethod || 'bank'));
             return (
               <li key={entry.id} className="entry-row">
                 <span className={`entry-row__icon entry-row__icon--${cat.color}`} aria-hidden="true">
@@ -50,10 +52,15 @@ export default function EntryList({ entries, onDelete }) {
                   <p className="entry-row__title">
                     {cat.label}{entry.note ? ` · ${entry.note}` : ''}
                   </p>
-                  <p className="entry-row__date">{formatDateThai(entry.date)}</p>
+                  <p className="entry-row__date">
+                    {formatDateThai(entry.date)}
+                    <span className="entry-row__method" aria-label={paymentMethod.label}>
+                      <span aria-hidden="true">{paymentMethod.icon}</span>
+                    </span>
+                  </p>
                 </div>
                 <span className={`entry-row__amount entry-row__amount--${entry.type}`}>
-                  {entry.type === 'income' ? '+' : '−'}฿{formatTHB(entry.amount)}
+                  {entry.type === 'income' ? '+' : '−'}<Baht />{formatTHB(entry.amount)}
                 </span>
                 <button
                   className="entry-row__delete"
